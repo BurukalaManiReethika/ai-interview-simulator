@@ -1,10 +1,140 @@
-[
-    "What is Python?",
-    "Explain OOP concepts.",
-    "What is a List in Python?",
-    "Difference between List and Tuple?",
-    "What is SQL?",
-    "What is a Primary Key?",
-    "Tell me about yourself.",
-    "Why should we hire you?"
-]
+{
+  "Python": {
+    "easy": [
+      {"q": "What is a list in Python, and how does it differ from a tuple?", "tip": "Focus on mutability, syntax, and common use cases."},
+      {"q": "Explain what a dictionary is in Python.", "tip": "Mention key-value pairs, hash maps, and when to use them."},
+      {"q": "What is the difference between `==` and `is` in Python?", "tip": "Think about value equality vs identity/memory address."},
+      {"q": "What are Python's built-in data types?", "tip": "Cover int, float, str, list, tuple, dict, set, bool, and bytes."},
+      {"q": "What is the difference between a function and a method in Python?", "tip": "Focus on the relationship with objects and classes."}
+    ],
+    "medium": [
+      {"q": "What are Python decorators and how do they work?", "tip": "Explain the wrapper function pattern and give a practical example."},
+      {"q": "Explain list comprehensions and generator expressions. What are the trade-offs?", "tip": "Consider memory efficiency and readability."},
+      {"q": "What is the GIL in CPython and how does it affect multi-threading?", "tip": "Discuss CPU-bound vs I/O-bound workloads."},
+      {"q": "Explain *args and **kwargs in Python. When would you use each?", "tip": "Show examples of both positional and keyword argument unpacking."},
+      {"q": "What are context managers and how do you implement one?", "tip": "Cover __enter__, __exit__, and the contextlib module."}
+    ],
+    "hard": [
+      {"q": "Explain Python's memory management, including garbage collection and reference counting.", "tip": "Cover reference cycles, the gc module, and generational GC."},
+      {"q": "How do metaclasses work in Python? Give a practical use case.", "tip": "Walk through __new__, type, and when you'd choose metaclasses over decorators."},
+      {"q": "Design a thread-safe singleton in Python. Explain your approach.", "tip": "Consider double-checked locking, module-level singletons, and alternatives."},
+      {"q": "Explain Python's descriptor protocol and how it powers properties and classmethods.", "tip": "Cover __get__, __set__, __delete__ and the difference between data and non-data descriptors."},
+      {"q": "How does async/await work in Python? Explain the event loop internals.", "tip": "Discuss coroutines, the event loop, tasks, and when async is actually beneficial."}
+    ]
+  },
+  "Data Structures": {
+    "easy": [
+      {"q": "Explain the difference between a stack and a queue. When would you use each?", "tip": "Use everyday analogies to make this concrete."},
+      {"q": "What is a linked list? What are its advantages over arrays?", "tip": "Discuss insertion/deletion time complexity vs random access."},
+      {"q": "What is a hash table and how does it handle collisions?", "tip": "Mention chaining and open addressing."},
+      {"q": "What is the difference between an array and a dynamic array (like Python's list)?", "tip": "Cover fixed vs variable size, amortized resizing cost."},
+      {"q": "What is a binary tree? Define leaf nodes, root, and height.", "tip": "Draw a small example mentally and describe each part."}
+    ],
+    "medium": [
+      {"q": "Explain how a binary search tree (BST) works and when it becomes inefficient.", "tip": "Discuss O(log n) average vs O(n) worst case for unbalanced trees."},
+      {"q": "What is a heap data structure? How would you implement a priority queue?", "tip": "Cover min-heap, max-heap, and heapify operations."},
+      {"q": "Explain graph representations (adjacency matrix vs adjacency list) and their trade-offs.", "tip": "Think about space complexity and the types of queries each supports."},
+      {"q": "What is a balanced BST? Explain AVL trees or Red-Black trees.", "tip": "Discuss rotation operations and why balance matters for worst-case performance."},
+      {"q": "What is a bloom filter and when would you use one?", "tip": "Cover false positives, false negatives, and real-world use cases like caching."}
+    ],
+    "hard": [
+      {"q": "Design a LRU (Least Recently Used) cache. What data structures would you use and why?", "tip": "The optimal solution uses a combination of two data structures."},
+      {"q": "How does a trie (prefix tree) work? Implement autocomplete using a trie.", "tip": "Discuss time and space complexity vs other approaches."},
+      {"q": "Explain B-trees and why databases use them for indexing instead of balanced BSTs.", "tip": "Focus on disk I/O, page sizes, and cache efficiency."},
+      {"q": "Explain skip lists. How do they compare to balanced BSTs in practice?", "tip": "Cover probabilistic balancing, cache performance, and concurrent access."},
+      {"q": "Design a data structure that supports insert, delete, and getRandom in O(1) time.", "tip": "Think about combining multiple structures to meet all three constraints."}
+    ]
+  },
+  "Algorithms": {
+    "easy": [
+      {"q": "Explain binary search. What are its time and space complexity?", "tip": "Walk through an example step by step."},
+      {"q": "What is bubble sort? What is its worst-case time complexity?", "tip": "Show you understand why it's rarely used in practice."},
+      {"q": "What is recursion? Give an example of a problem that benefits from it.", "tip": "Don't forget to mention base cases."},
+      {"q": "Explain the two-pointer technique with an example.", "tip": "A classic example: finding a pair that sums to a target in a sorted array."},
+      {"q": "What is Big O notation? Explain O(1), O(n), O(n log n), and O(n^2).", "tip": "Give a concrete algorithm example for each."}
+    ],
+    "medium": [
+      {"q": "Explain dynamic programming. How do you identify if a problem can be solved with DP?", "tip": "Discuss optimal substructure and overlapping subproblems."},
+      {"q": "Compare merge sort and quicksort. When would you prefer one over the other?", "tip": "Consider average/worst cases, stability, and in-place sorting."},
+      {"q": "What is Dijkstra's algorithm and what problem does it solve?", "tip": "Mention the priority queue and its time complexity."},
+      {"q": "Explain BFS vs DFS. When would you choose one over the other?", "tip": "Cover shortest path, cycle detection, and space complexity differences."},
+      {"q": "What is the sliding window technique? Give an example problem it solves efficiently.", "tip": "Contrast it with the brute force O(n^2) approach it replaces."}
+    ],
+    "hard": [
+      {"q": "Explain the traveling salesman problem (TSP). What approaches exist for solving it?", "tip": "Cover brute force, DP (Held-Karp), and approximation algorithms."},
+      {"q": "What is the difference between P, NP, and NP-complete problems? Give examples.", "tip": "Focus on reduction proofs and why P=NP matters."},
+      {"q": "Explain the A* search algorithm and how it compares to Dijkstra's.", "tip": "Discuss the heuristic function and admissibility."},
+      {"q": "What is the union-find (disjoint set) data structure? Explain path compression and union by rank.", "tip": "Show how it achieves near-O(1) amortized operations."},
+      {"q": "Explain Kadane's algorithm and extend it: how would you find the subarray with the maximum product?", "tip": "The max product variant requires tracking both min and max at each step."}
+    ]
+  },
+  "System Design": {
+    "easy": [
+      {"q": "What is the difference between vertical and horizontal scaling?", "tip": "Include real-world examples and the limits of each approach."},
+      {"q": "Explain what a REST API is and its key principles.", "tip": "Cover statelessness, resource-based URLs, and HTTP methods."},
+      {"q": "What is a CDN and why would you use one?", "tip": "Think about latency, availability, and content types."},
+      {"q": "What is load balancing? Name two common algorithms.", "tip": "Cover round-robin, least connections, and why it matters."},
+      {"q": "What is the difference between SQL and NoSQL databases?", "tip": "Include schema flexibility, consistency models, and example use cases."}
+    ],
+    "medium": [
+      {"q": "How would you design a URL shortener like bit.ly? Walk through the key components.", "tip": "Think about the encoding scheme, database choice, and handling redirects at scale."},
+      {"q": "Explain the CAP theorem. How does it affect database choices?", "tip": "Use concrete examples of systems that prioritize consistency vs availability."},
+      {"q": "What are microservices? What problems do they solve and what new problems do they introduce?", "tip": "Cover service discovery, distributed tracing, and data consistency."},
+      {"q": "How does caching work at different layers of a web application? What are cache invalidation strategies?", "tip": "Cover browser cache, CDN, application cache (Redis), and database query cache."},
+      {"q": "Explain message queues. When would you use one, and what are the trade-offs?", "tip": "Cover async decoupling, backpressure, at-least-once delivery, and idempotency."}
+    ],
+    "hard": [
+      {"q": "Design a distributed rate limiter for an API that handles 10 million requests per second.", "tip": "Consider token bucket, sliding window algorithms, and Redis-based implementations."},
+      {"q": "How would you design Twitter's news feed? Address the fan-out problem.", "tip": "Discuss push vs pull models and how celebrity accounts complicate the naive approach."},
+      {"q": "Design a globally distributed key-value store like Dynamo. What consistency model would you choose?", "tip": "Cover consistent hashing, vector clocks, and eventual consistency trade-offs."},
+      {"q": "How would you design a real-time collaborative document editor like Google Docs?", "tip": "Cover operational transformation (OT) or CRDTs, WebSocket communication, and conflict resolution."},
+      {"q": "Design a distributed job scheduler that can handle millions of cron jobs.", "tip": "Cover leader election, time zones, exactly-once execution, and failure recovery."}
+    ]
+  },
+  "Behavioral": {
+    "easy": [
+      {"q": "Tell me about yourself and why you're interested in this role.", "tip": "Keep it concise: background → skills → why this role. 2-3 minutes max."},
+      {"q": "Describe a time you worked effectively as part of a team.", "tip": "Use STAR format: Situation, Task, Action, Result."},
+      {"q": "What is your greatest strength and how have you applied it professionally?", "tip": "Be specific with a real example, not just a generic claim."},
+      {"q": "Where do you see yourself in 5 years?", "tip": "Be honest but align with growth opportunities the role offers."},
+      {"q": "Why are you leaving your current job?", "tip": "Stay positive — focus on growth, not complaints about the current employer."}
+    ],
+    "medium": [
+      {"q": "Describe a situation where you had to meet a tight deadline. How did you handle it?", "tip": "Focus on your decision-making process and the outcome."},
+      {"q": "Tell me about a time you disagreed with your manager or a colleague. What did you do?", "tip": "Show professional communication and focus on the outcome, not the conflict."},
+      {"q": "Describe a project you're most proud of. What was your specific contribution?", "tip": "Highlight your individual impact, technical decisions, and what you learned."},
+      {"q": "How do you prioritize when you have multiple urgent tasks competing for your attention?", "tip": "Show a systematic approach — impact/effort matrix, stakeholder communication, etc."},
+      {"q": "Tell me about a time you had to learn a new technology quickly.", "tip": "Highlight your learning process, resources you used, and how you applied it."}
+    ],
+    "hard": [
+      {"q": "Tell me about a time you failed. What did you learn from it?", "tip": "Be genuinely honest — interviewers can tell when an answer is sanitized."},
+      {"q": "Describe a time you had to influence people without having direct authority.", "tip": "Show leadership, persuasion skills, and how you built consensus."},
+      {"q": "Walk me through how you've handled ambiguity in a previous role. Give a specific example.", "tip": "Show you can structure uncertain situations, make decisions with incomplete data, and iterate."},
+      {"q": "Tell me about a time you had to make a difficult decision with limited information.", "tip": "Cover how you gathered what data you could, the decision framework you used, and the outcome."},
+      {"q": "Describe a time you had to push back on unrealistic expectations from stakeholders.", "tip": "Show assertiveness combined with empathy — propose alternatives, not just no."}
+    ]
+  },
+  "SQL": {
+    "easy": [
+      {"q": "What is the difference between INNER JOIN, LEFT JOIN, and RIGHT JOIN?", "tip": "Use a Venn diagram analogy to explain overlapping and non-overlapping sets."},
+      {"q": "What is the difference between WHERE and HAVING clauses?", "tip": "Think about when aggregation happens in the query execution order."},
+      {"q": "What are primary keys and foreign keys? Why are they important?", "tip": "Cover uniqueness, referential integrity, and indexing implications."},
+      {"q": "What does SELECT DISTINCT do? When would you use it?", "tip": "Give a concrete example and mention the performance cost."},
+      {"q": "Explain the ORDER BY and GROUP BY clauses with examples.", "tip": "Show how GROUP BY collapses rows and what aggregate functions do."}
+    ],
+    "medium": [
+      {"q": "Explain window functions in SQL. Give an example use case.", "tip": "Compare RANK(), ROW_NUMBER(), and LAG()/LEAD() and when each applies."},
+      {"q": "What is query optimization? How would you diagnose a slow SQL query?", "tip": "Mention EXPLAIN plans, index usage, and common anti-patterns."},
+      {"q": "What is database normalization? Explain 1NF, 2NF, and 3NF.", "tip": "Give a concrete example of a poorly designed table and how to normalize it."},
+      {"q": "What are CTEs (Common Table Expressions)? How do they differ from subqueries?", "tip": "Cover readability, recursion, and whether performance differs."},
+      {"q": "Explain the difference between clustered and non-clustered indexes.", "tip": "Cover how each is stored, when to use each, and the limit on clustered indexes per table."}
+    ],
+    "hard": [
+      {"q": "Design a schema for a social network. How would you efficiently query mutual friends?", "tip": "Consider graph structures vs relational approaches and index strategies."},
+      {"q": "Explain ACID properties. What happens when they're relaxed for performance?", "tip": "Cover real-world databases that make different ACID trade-offs."},
+      {"q": "How does a database engine execute a query internally? Walk through the steps.", "tip": "Cover parsing, planning, optimization, and execution stages."},
+      {"q": "What are isolation levels in SQL? Explain dirty reads, phantom reads, and non-repeatable reads.", "tip": "Map each isolation level to the anomalies it prevents."},
+      {"q": "How would you design and maintain a slowly changing dimension (SCD) in a data warehouse?", "tip": "Explain Type 1, Type 2, and Type 3 SCDs with trade-offs for each."}
+    ]
+  }
+}
