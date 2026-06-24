@@ -1,28 +1,97 @@
-<!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
-    <title>AI Interview Simulator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Interview Simulator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-    <h1>AI Interview Simulator</h1>
+  <div class="page">
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="28" height="28" rx="8" fill="#534AB7"/>
+            <path d="M8 20L12 10L16 16L19 12L22 20" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="9" cy="9" r="2" fill="#AFA9EC"/>
+          </svg>
+          <span class="logo-text">AI Interview Simulator</span>
+        </div>
+        <div class="header-meta" id="session-stats" style="display:none;">
+          <span class="stat-pill" id="header-count">0 answered</span>
+          <span class="stat-pill accent" id="header-avg">Avg: —</span>
+        </div>
+      </div>
+    </header>
 
-    <h3>Question:</h3>
-    <p>{{ question }}</p>
+    <main class="main">
+      <!-- SETUP PANEL -->
+      <div id="setup-panel" class="panel">
+        <h1 class="panel-title">Choose your topic</h1>
+        <p class="panel-sub">Select a domain and difficulty, then answer questions to get AI-powered feedback.</p>
 
-    <form action="/evaluate" method="POST">
-        <textarea
-            name="answer"
-            rows="6"
-            cols="60"
-            placeholder="Type your answer here..."
-            required>
-        </textarea>
+        <div class="section-label">Domain</div>
+        <div class="domain-grid" id="domain-grid"></div>
 
-        <br><br>
+        <div class="section-label" style="margin-top:1.5rem;">Difficulty</div>
+        <div class="diff-row">
+          <button class="diff-btn active easy" data-diff="easy" onclick="setDiff(this)">Easy</button>
+          <button class="diff-btn medium" data-diff="medium" onclick="setDiff(this)">Medium</button>
+          <button class="diff-btn hard" data-diff="hard" onclick="setDiff(this)">Hard</button>
+        </div>
 
-        <button type="submit">
-            Submit Answer
+        <button class="btn-primary" style="margin-top:2rem;" onclick="startQuestion()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Start question
         </button>
-    </form>
+
+        <!-- History section inline -->
+        <div id="history-section" style="margin-top:3rem; display:none;">
+          <div class="section-label">Session history</div>
+          <div class="metrics-row" id="metrics-row"></div>
+          <div class="history-list" id="history-list"></div>
+        </div>
+      </div>
+
+      <!-- QUESTION PANEL -->
+      <div id="question-panel" class="panel" style="display:none;">
+        <div class="q-meta">
+          <span class="badge domain-badge" id="q-domain-badge"></span>
+          <span class="badge diff-badge" id="q-diff-badge"></span>
+          <span class="timer" id="timer">0:00</span>
+          <button class="back-btn" onclick="goBack()">← Change topic</button>
+        </div>
+
+        <div class="question-card">
+          <div class="question-text" id="question-text"></div>
+          <div class="question-tip" id="question-tip"></div>
+        </div>
+
+        <div class="answer-meta">
+          <span class="word-count" id="word-count">0 words</span>
+          <span class="answer-hint">Write a thorough answer — aim for at least 50 words</span>
+        </div>
+        <textarea
+          id="answer-textarea"
+          placeholder="Type your answer here…"
+          oninput="onAnswerInput()"
+        ></textarea>
+
+        <div class="btn-row">
+          <button class="btn-primary" id="submit-btn" onclick="submitAnswer()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Submit answer
+          </button>
+          <button class="btn-ghost" onclick="skipQuestion()">Skip</button>
+        </div>
+
+        <!-- Result area -->
+        <div id="result-area"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
