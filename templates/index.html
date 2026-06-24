@@ -1,97 +1,462 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Interview Simulator</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple-50: #EEEDFE;
+      --purple-400: #7F77DD;
+      --purple-600: #534AB7;
+      --purple-800: #3C3489;
+      --teal-50: #E1F5EE;
+      --teal-600: #0F6E56;
+      --amber-50: #FAEEDA;
+      --amber-600: #854F0B;
+      --amber-400: #BA7517;
+      --red-50: #FCEBEB;
+      --red-400: #A32D2D;
+      --green-50: #EAF3DE;
+      --green-600: #3B6D11;
+      --bg: #FAFAF8;
+      --surface: #FFFFFF;
+      --border: rgba(0,0,0,0.10);
+      --border-md: rgba(0,0,0,0.18);
+      --text: #1A1A18;
+      --text2: #5F5E5A;
+      --text3: #888780;
+      --gray: #F4F4F0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141410;
+        --surface: #1E1E18;
+        --border: rgba(255,255,255,0.09);
+        --border-md: rgba(255,255,255,0.17);
+        --text: #F0EFE8;
+        --text2: #A8A79E;
+        --text3: #6E6D66;
+        --gray: #242420;
+        --purple-50: #1C1A38;
+        --teal-50: #0C2820;
+        --amber-50: #281E08;
+        --red-50: #28100E;
+        --green-50: #0E1C07;
+      }
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+    /* Header */
+    .hdr { border-bottom: 0.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 10; }
+    .hdr-inner { max-width: 700px; margin: 0 auto; padding: 13px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 600; color: var(--text); }
+    .logo svg { flex-shrink: 0; }
+    .hdr-stats { display: none; gap: 8px; }
+    .hdr-stats.show { display: flex; }
+    .pill { font-size: 12px; padding: 3px 10px; border-radius: 99px; background: var(--gray); color: var(--text2); border: 0.5px solid var(--border); }
+    .pill.accent { background: var(--purple-50); color: var(--purple-600); }
+
+    /* Main */
+    .main { max-width: 700px; margin: 0 auto; padding: 2rem 20px 4rem; }
+
+    /* Panels */
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .ptitle { font-size: 22px; font-weight: 600; margin-bottom: 5px; }
+    .psub { font-size: 14px; color: var(--text2); margin-bottom: 2rem; }
+    .slabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 9px; }
+
+    /* Domain grid */
+    .dgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 1.75rem; }
+    .dcard { padding: 12px 13px; border-radius: 10px; border: 0.5px solid var(--border); background: var(--surface); cursor: pointer; transition: border-color .12s, background .12s, transform .1s; user-select: none; }
+    .dcard:hover { border-color: var(--border-md); background: var(--gray); }
+    .dcard:active { transform: scale(.97); }
+    .dcard.sel { border-color: var(--purple-400); background: var(--purple-50); }
+    .dcard .icon { font-size: 22px; margin-bottom: 5px; }
+    .dcard .name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .dcard .cnt { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .dcard.sel .name { color: var(--purple-800); }
+    .dcard.sel .cnt { color: var(--purple-600); }
+
+    /* Difficulty */
+    .drow { display: flex; gap: 8px; margin-bottom: 2rem; }
+    .dbtn { padding: 7px 18px; border-radius: 99px; border: 0.5px solid var(--border); background: transparent; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text2); transition: all .12s; font-family: inherit; }
+    .dbtn:hover { border-color: var(--border-md); }
+    .dbtn.sel.easy { background: var(--green-50); color: var(--green-600); border-color: var(--green-600); }
+    .dbtn.sel.medium { background: var(--amber-50); color: var(--amber-600); border-color: var(--amber-400); }
+    .dbtn.sel.hard { background: var(--red-50); color: var(--red-400); border-color: var(--red-400); }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 20px; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .12s; border: none; }
+    .btn-p { background: var(--purple-600); color: #fff; }
+    .btn-p:hover { background: var(--purple-800); }
+    .btn-p:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-g { background: transparent; color: var(--text2); border: 0.5px solid var(--border); }
+    .btn-g:hover { background: var(--gray); border-color: var(--border-md); }
+    .brow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* Question panel */
+    .qmeta { display: flex; gap: 7px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+    .badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+    .bdomain { background: var(--purple-50); color: var(--purple-600); }
+    .bdiff.easy { background: var(--green-50); color: var(--green-600); }
+    .bdiff.medium { background: var(--amber-50); color: var(--amber-600); }
+    .bdiff.hard { background: var(--red-50); color: var(--red-400); }
+    .timer { font-size: 12px; font-weight: 500; color: var(--text3); margin-left: auto; font-variant-numeric: tabular-nums; }
+    .timer.warn { color: var(--amber-400); }
+    .timer.danger { color: var(--red-400); }
+    .backbtn { font-size: 12px; color: var(--text3); background: none; border: none; cursor: pointer; font-family: inherit; }
+    .backbtn:hover { color: var(--text2); }
+
+    .qcard { background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 1.4rem; margin-bottom: 1rem; }
+    .qtext { font-size: 17px; font-weight: 500; line-height: 1.6; }
+    .qtip { margin-top: 11px; font-size: 13px; color: var(--text2); padding: 9px 13px; border-left: 2.5px solid var(--purple-400); background: var(--purple-50); border-radius: 0 6px 6px 0; }
+
+    .ameta { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 12px; color: var(--text3); }
+    textarea { width: 100%; min-height: 145px; resize: vertical; border-radius: 9px; border: 0.5px solid var(--border-md); padding: 11px 13px; font-size: 15px; font-family: inherit; line-height: 1.7; color: var(--text); background: var(--surface); margin-bottom: 12px; transition: border-color .15s, box-shadow .15s; }
+    textarea:focus { outline: none; border-color: var(--purple-400); box-shadow: 0 0 0 3px rgba(127,119,221,.12); }
+
+    /* Spinner */
+    .spin { display: inline-flex; gap: 4px; align-items: center; }
+    .spin span { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: bop 1.2s ease-in-out infinite; }
+    .spin span:nth-child(2) { animation-delay: .15s; }
+    .spin span:nth-child(3) { animation-delay: .3s; }
+    @keyframes bop { 0%,80%,100%{opacity:.3;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+
+    /* Result */
+    .rcard { background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 1.4rem; margin-top: 1.5rem; }
+    .score-hdr { display: flex; align-items: center; gap: 15px; margin-bottom: 1.2rem; }
+    .score-circle { width: 66px; height: 66px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+    .score-info h3 { font-size: 17px; font-weight: 600; }
+    .score-info p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+    .cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.2rem; }
+    .crit { background: var(--gray); border-radius: 7px; padding: 10px 12px; }
+    .crit .cn { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text3); margin-bottom: 6px; }
+    .crit .cbar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+    .crit .cfill { height: 100%; border-radius: 2px; transition: width .6s ease; }
+    .crit .cscore { font-size: 14px; font-weight: 700; color: var(--text); }
+    .fblock { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--border); }
+    .fblock:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .flabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 6px; }
+    .ftext { font-size: 14px; color: var(--text); line-height: 1.7; }
+    .nrow { display: flex; gap: 8px; margin-top: 1.2rem; flex-wrap: wrap; }
+
+    /* History */
+    .mrow { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 1.2rem; }
+    .mcard { background: var(--gray); border-radius: 9px; padding: 12px 14px; }
+    .mcard .mv { font-size: 24px; font-weight: 700; }
+    .mcard .ml { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .hlist { display: flex; flex-direction: column; gap: 8px; }
+    .hitem { background: var(--surface); border: 0.5px solid var(--border); border-radius: 9px; padding: 11px 13px; }
+    .hitop { display: flex; gap: 6px; align-items: center; margin-bottom: 3px; }
+    .hiq { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+    .hiscore { font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .himeta { font-size: 12px; color: var(--text3); }
+
+    .error-banner { background: var(--red-50); border: 0.5px solid var(--red-400); border-radius: 9px; padding: 12px 14px; font-size: 14px; color: var(--red-400); margin-top: 1rem; }
+
+    @media (max-width: 500px) { .cgrid { grid-template-columns: 1fr; } .dgrid { grid-template-columns: repeat(2,1fr); } }
+  </style>
 </head>
 <body>
-  <div class="page">
-    <header class="header">
-      <div class="header-inner">
-        <div class="logo">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="28" height="28" rx="8" fill="#534AB7"/>
-            <path d="M8 20L12 10L16 16L19 12L22 20" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="9" cy="9" r="2" fill="#AFA9EC"/>
-          </svg>
-          <span class="logo-text">AI Interview Simulator</span>
-        </div>
-        <div class="header-meta" id="session-stats" style="display:none;">
-          <span class="stat-pill" id="header-count">0 answered</span>
-          <span class="stat-pill accent" id="header-avg">Avg: —</span>
-        </div>
-      </div>
-    </header>
 
-    <main class="main">
-      <!-- SETUP PANEL -->
-      <div id="setup-panel" class="panel">
-        <h1 class="panel-title">Choose your topic</h1>
-        <p class="panel-sub">Select a domain and difficulty, then answer questions to get AI-powered feedback.</p>
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect width="26" height="26" rx="7" fill="#534AB7"/>
+        <path d="M7 19L11 10L15 16L18 12L21 19" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="8" cy="8" r="2" fill="#AFA9EC"/>
+      </svg>
+      AI Interview Simulator
+    </div>
+    <div class="hdr-stats" id="hdr-stats">
+      <span class="pill" id="hdr-count">0 answered</span>
+      <span class="pill accent" id="hdr-avg">Avg: —</span>
+    </div>
+  </div>
+</header>
 
-        <div class="section-label">Domain</div>
-        <div class="domain-grid" id="domain-grid"></div>
+<main class="main">
 
-        <div class="section-label" style="margin-top:1.5rem;">Difficulty</div>
-        <div class="diff-row">
-          <button class="diff-btn active easy" data-diff="easy" onclick="setDiff(this)">Easy</button>
-          <button class="diff-btn medium" data-diff="medium" onclick="setDiff(this)">Medium</button>
-          <button class="diff-btn hard" data-diff="hard" onclick="setDiff(this)">Hard</button>
-        </div>
+  <!-- SETUP -->
+  <div class="panel active" id="panel-setup">
+    <div class="ptitle">Choose your topic</div>
+    <div class="psub">Select a domain and difficulty, then answer questions to get AI-powered feedback.</div>
 
-        <button class="btn-primary" style="margin-top:2rem;" onclick="startQuestion()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          Start question
-        </button>
+    <div class="slabel">Domain</div>
+    <div class="dgrid" id="domain-grid"></div>
 
-        <!-- History section inline -->
-        <div id="history-section" style="margin-top:3rem; display:none;">
-          <div class="section-label">Session history</div>
-          <div class="metrics-row" id="metrics-row"></div>
-          <div class="history-list" id="history-list"></div>
-        </div>
-      </div>
+    <div class="slabel">Difficulty</div>
+    <div class="drow">
+      <button class="dbtn sel easy" data-diff="easy" onclick="setDiff(this)">Easy</button>
+      <button class="dbtn medium" data-diff="medium" onclick="setDiff(this)">Medium</button>
+      <button class="dbtn hard" data-diff="hard" onclick="setDiff(this)">Hard</button>
+    </div>
 
-      <!-- QUESTION PANEL -->
-      <div id="question-panel" class="panel" style="display:none;">
-        <div class="q-meta">
-          <span class="badge domain-badge" id="q-domain-badge"></span>
-          <span class="badge diff-badge" id="q-diff-badge"></span>
-          <span class="timer" id="timer">0:00</span>
-          <button class="back-btn" onclick="goBack()">← Change topic</button>
-        </div>
+    <button class="btn btn-p" onclick="startQuestion()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
+      Start question
+    </button>
 
-        <div class="question-card">
-          <div class="question-text" id="question-text"></div>
-          <div class="question-tip" id="question-tip"></div>
-        </div>
-
-        <div class="answer-meta">
-          <span class="word-count" id="word-count">0 words</span>
-          <span class="answer-hint">Write a thorough answer — aim for at least 50 words</span>
-        </div>
-        <textarea
-          id="answer-textarea"
-          placeholder="Type your answer here…"
-          oninput="onAnswerInput()"
-        ></textarea>
-
-        <div class="btn-row">
-          <button class="btn-primary" id="submit-btn" onclick="submitAnswer()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            Submit answer
-          </button>
-          <button class="btn-ghost" onclick="skipQuestion()">Skip</button>
-        </div>
-
-        <!-- Result area -->
-        <div id="result-area"></div>
-      </div>
-    </main>
+    <div id="hist-section" style="margin-top:3rem; display:none;">
+      <div class="slabel">Session history</div>
+      <div class="mrow" id="mrow"></div>
+      <div class="hlist" id="hlist"></div>
+    </div>
   </div>
 
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <!-- QUESTION -->
+  <div class="panel" id="panel-question">
+    <div class="qmeta">
+      <span class="badge bdomain" id="qd"></span>
+      <span class="badge bdiff" id="qdiff"></span>
+      <span class="timer" id="timer">0:00</span>
+      <button class="backbtn" onclick="goBack()">← Change topic</button>
+    </div>
+
+    <div class="qcard">
+      <div class="qtext" id="qtext"></div>
+      <div class="qtip" id="qtip"></div>
+    </div>
+
+    <div class="ameta">
+      <span id="wc">0 words</span>
+      <span>Aim for at least 50 words</span>
+    </div>
+    <textarea id="ta" placeholder="Type your answer here…" oninput="onInput()"></textarea>
+
+    <div class="brow">
+      <button class="btn btn-p" id="sub-btn" onclick="submitAnswer()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Submit answer
+      </button>
+      <button class="btn btn-g" onclick="startQuestion()">Skip</button>
+      <button class="btn btn-g" onclick="goBack()">← Topics</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+</main>
+
+<script>
+// Domain data injected from Flask — no extra API call needed
+const DOMAINS = {{ domains_json | safe }};
+const API_KEY_SET = {{ 'true' if api_key_set else 'false' }};
+
+const ICONS = {
+  'Python':'🐍','Data Structures':'🌲','Algorithms':'⚡',
+  'System Design':'🏗️','Behavioral':'💬','SQL':'🗄️'
+};
+
+const S = {
+  domain: Object.keys(DOMAINS)[0] || 'Python',
+  diff: 'easy',
+  currentQ: null,
+  timerSecs: 0,
+  timerInt: null,
+  history: [],
+  busy: false
+};
+
+// Build domain grid immediately on load
+(function buildGrid() {
+  const g = document.getElementById('domain-grid');
+  for (const [name, diffs] of Object.entries(DOMAINS)) {
+    const total = Object.values(diffs).reduce((a,b)=>a+b,0);
+    const d = document.createElement('div');
+    d.className = 'dcard' + (name === S.domain ? ' sel' : '');
+    d.innerHTML = `<div class="icon">${ICONS[name]||'📋'}</div><div class="name">${name}</div><div class="cnt">${total} questions</div>`;
+    d.onclick = () => {
+      S.domain = name;
+      document.querySelectorAll('.dcard').forEach(c=>c.classList.remove('sel'));
+      d.classList.add('sel');
+    };
+    g.appendChild(d);
+  }
+})();
+
+function setDiff(el) {
+  S.diff = el.dataset.diff;
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('sel','easy','medium','hard'));
+  el.classList.add('sel', S.diff);
+}
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'panel-setup') renderHistory();
+}
+
+function goBack() {
+  clearInterval(S.timerInt);
+  showPanel('panel-setup');
+}
+
+function startTimer() {
+  S.timerSecs = 0;
+  clearInterval(S.timerInt);
+  const el = document.getElementById('timer');
+  S.timerInt = setInterval(() => {
+    S.timerSecs++;
+    const m = Math.floor(S.timerSecs/60), s = String(S.timerSecs%60).padStart(2,'0');
+    el.textContent = `${m}:${s}`;
+    el.className = 'timer' + (S.timerSecs > 300 ? ' danger' : S.timerSecs > 180 ? ' warn' : '');
+  }, 1000);
+}
+
+async function startQuestion() {
+  clearInterval(S.timerInt);
+  document.getElementById('result').innerHTML = '';
+  document.getElementById('ta').value = '';
+  document.getElementById('wc').textContent = '0 words';
+  resetSubBtn();
+
+  try {
+    const res = await fetch('/api/question', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({domain: S.domain, difficulty: S.diff})
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const q = await res.json();
+    if (q.error) throw new Error(q.error);
+    S.currentQ = q;
+
+    document.getElementById('qd').textContent = q.domain;
+    const db = document.getElementById('qdiff');
+    db.textContent = q.difficulty;
+    db.className = 'badge bdiff ' + q.difficulty;
+    document.getElementById('qtext').textContent = q.question;
+    document.getElementById('qtip').textContent = '💡 ' + q.tip;
+
+    showPanel('panel-question');
+    startTimer();
+  } catch(e) {
+    alert('Could not load question: ' + e.message);
+  }
+}
+
+function onInput() {
+  const words = document.getElementById('ta').value.trim().split(/\s+/).filter(w=>w).length;
+  document.getElementById('wc').textContent = words + ' word' + (words!==1?'s':'');
+}
+
+function resetSubBtn() {
+  const b = document.getElementById('sub-btn');
+  b.disabled = false;
+  b.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Submit answer`;
+  b.onclick = submitAnswer;
+}
+
+async function submitAnswer() {
+  if (S.busy) return;
+  const answer = document.getElementById('ta').value.trim();
+  if (!answer) { alert('Please write an answer first.'); return; }
+
+  if (!API_KEY_SET) {
+    document.getElementById('result').innerHTML = `<div class="error-banner">⚠️ ANTHROPIC_API_KEY is not set on the server. Add it to your Render environment variables.</div>`;
+    return;
+  }
+
+  clearInterval(S.timerInt);
+  S.busy = true;
+  const b = document.getElementById('sub-btn');
+  b.disabled = true;
+  b.innerHTML = `<span class="spin"><span></span><span></span><span></span></span> Evaluating…`;
+
+  document.getElementById('result').innerHTML = `<div class="rcard" style="color:var(--text2);text-align:center;padding:2rem"><span class="spin"><span></span><span></span><span></span></span> &nbsp; Analysing your answer with AI…</div>`;
+
+  try {
+    const res = await fetch('/api/evaluate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        question: S.currentQ.question,
+        answer,
+        domain: S.currentQ.domain,
+        difficulty: S.currentQ.difficulty,
+        time_taken: S.timerSecs
+      })
+    });
+    const ev = await res.json();
+    if (ev.error) throw new Error(ev.error);
+    renderResult(ev);
+    S.history.unshift({q: S.currentQ.question, domain: S.currentQ.domain, diff: S.currentQ.difficulty, score: ev.overall_score, grade: ev.grade, time: S.timerSecs});
+    updateHeader();
+  } catch(e) {
+    document.getElementById('result').innerHTML = `<div class="error-banner">⚠️ Evaluation failed: ${e.message}</div>`;
+    resetSubBtn();
+  }
+
+  S.busy = false;
+  b.disabled = false;
+  b.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg> Next question`;
+  b.onclick = startQuestion;
+}
+
+function renderResult(ev) {
+  const sc = ev.overall_score || 5;
+  const good = sc>=8, mid = sc>=5;
+  const col = good?'#1D9E75':mid?'#BA7517':'#A32D2D';
+  const bg  = good?'#E1F5EE':mid?'#FAEEDA':'#FCEBEB';
+  const mm = Math.floor(S.timerSecs/60), ss = String(S.timerSecs%60).padStart(2,'0');
+
+  const crit = ev.criteria || {};
+  const cgrid = Object.entries(crit).map(([k,v])=>{
+    const pct=(v/10)*100, c=v>=8?'#1D9E75':v>=5?'#BA7517':'#A32D2D';
+    return `<div class="crit"><div class="cn">${k}</div><div class="cbar"><div class="cfill" style="width:${pct}%;background:${c}"></div></div><div class="cscore">${v}/10</div></div>`;
+  }).join('');
+
+  document.getElementById('result').innerHTML = `
+  <div class="rcard">
+    <div class="score-hdr">
+      <div class="score-circle" style="background:${bg};color:${col}">${sc}/10</div>
+      <div class="score-info"><h3>${ev.grade||'Evaluated'}</h3><p>Time: ${mm}:${ss}</p></div>
+    </div>
+    ${cgrid ? `<div class="cgrid">${cgrid}</div>` : ''}
+    <div class="fblock"><div class="flabel">✅ Strengths</div><div class="ftext">${ev.strengths||'—'}</div></div>
+    <div class="fblock"><div class="flabel">📈 Areas to improve</div><div class="ftext">${ev.improvements||'—'}</div></div>
+    ${ev.model_answer?`<div class="fblock"><div class="flabel">💡 Model answer</div><div class="ftext">${ev.model_answer}</div></div>`:''}
+    <div class="nrow">
+      <button class="btn btn-p" onclick="startQuestion()"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg> Next question</button>
+      <button class="btn btn-g" onclick="goBack()">Change topic</button>
+    </div>
+  </div>`;
+}
+
+function renderHistory() {
+  const sec = document.getElementById('hist-section');
+  if (!S.history.length) { sec.style.display='none'; return; }
+  sec.style.display = 'block';
+  const scores = S.history.map(h=>h.score);
+  const avg = (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1);
+  document.getElementById('mrow').innerHTML = `
+    <div class="mcard"><div class="mv">${S.history.length}</div><div class="ml">Answered</div></div>
+    <div class="mcard"><div class="mv">${avg}</div><div class="ml">Average score</div></div>
+    <div class="mcard"><div class="mv">${Math.max(...scores)}/10</div><div class="ml">Best score</div></div>`;
+  document.getElementById('hlist').innerHTML = S.history.map(h=>{
+    const c=h.score>=8?'#1D9E75':h.score>=5?'#BA7517':'#A32D2D';
+    const mm=Math.floor(h.time/60),ss=String(h.time%60).padStart(2,'0');
+    return `<div class="hitem">
+      <div class="hitop"><span class="badge bdomain">${h.domain}</span><span class="badge bdiff ${h.diff}">${h.diff}</span><span class="hiq">${h.q}</span><span class="hiscore" style="color:${c}">${h.score}/10</span></div>
+      <div class="himeta">${h.grade} · ${mm}:${ss}</div></div>`;
+  }).join('');
+}
+
+function updateHeader() {
+  if (!S.history.length) return;
+  const scores = S.history.map(h=>h.score);
+  document.getElementById('hdr-stats').classList.add('show');
+  document.getElementById('hdr-count').textContent = S.history.length + ' answered';
+  document.getElementById('hdr-avg').textContent = 'Avg: ' + (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1);
+}
+</script>
 </body>
 </html>
